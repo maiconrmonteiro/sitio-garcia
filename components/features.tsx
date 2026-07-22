@@ -1,4 +1,9 @@
+"use client"
+
 import { Trees, Home, Car, Users, Leaf } from "lucide-react"
+import { motion } from "motion/react"
+import { SectionHeading } from "@/components/section-heading"
+import { staggerContainer, staggerItem } from "@/components/motion/stagger"
 
 const features = [
   {
@@ -32,23 +37,24 @@ export function Features() {
   return (
     <section id="diferenciais" className="py-20 lg:py-32 bg-background">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <span className="font-[var(--font-lato)] text-primary text-sm font-semibold tracking-widest uppercase mb-4 block">
-            Diferenciais
-          </span>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground mb-4 text-balance">
-            Por que escolher o Sítio Garcia?
-          </h2>
-          <p className="font-[var(--font-lato)] text-muted-foreground text-lg max-w-2xl mx-auto">
-            Oferecemos uma experiência completa para tornar seu evento inesquecível
-          </p>
-        </div>
+        <SectionHeading
+          eyebrow="Diferenciais"
+          title="Por que escolher o Sítio Garcia?"
+          description="Oferecemos uma experiência completa para tornar seu evento inesquecível"
+        />
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-          {features.map((feature, index) => (
-            <div
-              key={index}
-              className="group bg-card rounded-2xl p-6 text-center shadow-sm hover:shadow-xl transition-all duration-300 border border-border/50"
+        <motion.div
+          className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-80px" }}
+          variants={staggerContainer}
+        >
+          {features.map((feature) => (
+            <motion.div
+              key={feature.title}
+              variants={staggerItem}
+              className="group bg-card rounded-2xl p-6 text-center shadow-sm hover:shadow-[var(--shadow-elevated)] transition-all duration-300 border border-border/50"
             >
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary group-hover:scale-110 transition-all duration-300">
                 <feature.icon className="w-8 h-8 text-primary group-hover:text-primary-foreground transition-colors" />
@@ -57,9 +63,9 @@ export function Features() {
               <p className="font-[var(--font-lato)] text-muted-foreground text-sm">
                 {feature.description}
               </p>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   )

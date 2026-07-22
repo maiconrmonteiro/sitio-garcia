@@ -1,6 +1,7 @@
-import Image from "next/image"
 import Link from "next/link"
 import { Phone, MapPin, Instagram, Facebook } from "lucide-react"
+import { Logo } from "@/components/logo"
+import { siteConfig } from "@/lib/site-config"
 
 export function Footer() {
   return (
@@ -9,13 +10,9 @@ export function Footer() {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           {/* Logo and tagline */}
           <div className="lg:col-span-2">
-            <Image
-              src="/images/logo.png"
-              alt="Sítio Garcia"
-              width={120}
-              height={120}
-              className="mb-6"
-            />
+            <Link href="/" className="inline-block mb-6">
+              <Logo variant="footer" />
+            </Link>
             <p className="font-[var(--font-lato)] text-card/80 text-lg max-w-md">
               Transformando momentos em memórias inesquecíveis
             </p>
@@ -27,15 +24,16 @@ export function Footer() {
             <ul className="font-[var(--font-lato)] space-y-4">
               <li className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-primary" />
-                <a href="tel:+5548999557220" className="text-card/80 hover:text-primary transition-colors">
-                  (48) 99955-7220
+                <a href={`tel:${siteConfig.whatsapp.tel}`} className="text-card/80 hover:text-primary transition-colors">
+                  {siteConfig.whatsapp.display}
                 </a>
               </li>
               <li className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
                 <span className="text-card/80">
-                  Rua Elesbão Miguel Cardoso, s/n<br />
-                  Bairro Santa Catarina - Biguaçu, SC
+                  {siteConfig.address.street}
+                  <br />
+                  {siteConfig.address.neighborhood} - {siteConfig.address.city}, {siteConfig.address.state}
                 </span>
               </li>
             </ul>
@@ -46,7 +44,7 @@ export function Footer() {
             <h4 className="font-semibold text-xl mb-6">Redes Sociais</h4>
             <div className="flex gap-4">
               <a
-                href="https://instagram.com"
+                href={siteConfig.social.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-12 h-12 rounded-full bg-card/10 flex items-center justify-center hover:bg-primary hover:scale-110 transition-all"
@@ -55,7 +53,7 @@ export function Footer() {
                 <Instagram className="w-5 h-5" />
               </a>
               <a
-                href="https://facebook.com"
+                href={siteConfig.social.facebook}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-12 h-12 rounded-full bg-card/10 flex items-center justify-center hover:bg-primary hover:scale-110 transition-all"
@@ -70,7 +68,7 @@ export function Footer() {
         {/* Bottom */}
         <div className="border-t border-card/20 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="font-[var(--font-lato)] text-card/60 text-sm">
-            &copy; {new Date().getFullYear()} Sítio Garcia. Todos os direitos reservados.
+            &copy; {new Date().getFullYear()} {siteConfig.name}. Todos os direitos reservados.
           </p>
           <nav className="font-[var(--font-lato)] flex gap-6 text-sm">
             <Link href="#sobre" className="text-card/60 hover:text-primary transition-colors">

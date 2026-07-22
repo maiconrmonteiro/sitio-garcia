@@ -11,7 +11,7 @@
   --card-foreground: oklch(0.25 0.02 150);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.25 0.02 150);
-  --primary: oklch(0.45 0.12 145);
+  --primary: oklch(0.4 0.13 145);
   --primary-foreground: oklch(0.98 0.005 90);
   --secondary: oklch(0.92 0.02 85);
   --secondary-foreground: oklch(0.35 0.05 150);
@@ -23,7 +23,7 @@
   --destructive-foreground: oklch(0.577 0.245 27.325);
   --border: oklch(0.88 0.02 90);
   --input: oklch(0.92 0.01 90);
-  --ring: oklch(0.45 0.12 145);
+  --ring: oklch(0.4 0.13 145);
   --chart-1: oklch(0.45 0.12 145);
   --chart-2: oklch(0.6 0.1 85);
   --chart-3: oklch(0.55 0.08 200);
@@ -106,6 +106,8 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --shadow-soft: 0 4px 20px -4px oklch(0.4 0.13 145 / 0.15);
+  --shadow-elevated: 0 20px 50px -12px oklch(0.35 0.1 145 / 0.28);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -125,25 +127,24 @@
   }
 }
 
+@layer components {
+  /* Rótulo pequeno em versal acima dos títulos de seção ("Sobre o Espaço", "Galeria"...) */
+  .text-eyebrow {
+    @apply font-[var(--font-lato)] text-primary text-sm font-semibold tracking-widest uppercase mb-4 block;
+  }
+  /* Título principal de cada seção da página */
+  .heading-section {
+    @apply text-3xl md:text-4xl lg:text-5xl font-semibold text-foreground mb-4 text-balance;
+  }
+  /* Parágrafo de apoio, centralizado, logo abaixo do heading-section */
+  .text-lede {
+    @apply font-[var(--font-lato)] text-muted-foreground text-lg max-w-2xl mx-auto;
+  }
+}
+
 /* Smooth scroll */
 html {
   scroll-behavior: smooth;
-}
-
-/* Custom animations */
-@keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fade-in-up {
-  animation: fade-in-up 0.6s ease-out forwards;
 }
 
 /* Gallery hover effect */
@@ -153,5 +154,19 @@ html {
 
 .gallery-item:hover {
   transform: scale(1.02);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-elevated);
+}
+
+/* Respeita a preferência do sistema por menos movimento: reduz (não remove)
+   a duração de qualquer animação/transição CSS que ainda exista fora do
+   Motion (que já trata isso via useReducedMotion nos próprios componentes). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

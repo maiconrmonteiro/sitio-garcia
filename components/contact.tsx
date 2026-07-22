@@ -1,23 +1,43 @@
 "use client"
 
-import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
+import { toast } from "sonner"
+import { Send } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Send } from "lucide-react"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { buildWhatsappUrl, siteConfig } from "@/lib/site-config"
+
+const EVENT_TYPES = ["Casamento", "Aniversário", "Evento Corporativo", "Confraternização", "Outro"]
+
+const contactSchema = z.object({
+  name: z.string().min(2, "Informe seu nome completo"),
+  phone: z.string().min(10, "Informe um telefone válido com DDD"),
+  date: z.string().min(1, "Selecione a data do evento"),
+  eventType: z.string().min(1, "Selecione o tipo de evento"),
+})
+
+type ContactFormValues = z.infer<typeof contactSchema>
 
 export function Contact() {
-  const [formData, setFormData] = useState({
-    name: "",
-    phone: "",
-    date: "",
-    eventType: "",
+  const form = useForm<ContactFormValues>({
+    resolver: zodResolver(contactSchema),
+    defaultValues: { name: "", phone: "", date: "", eventType: "" },
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    const message = `Olá! Gostaria de solicitar um orçamento para o Sítio Garcia.\n\nNome: ${formData.name}\nTelefone: ${formData.phone}\nData do evento: ${formData.date}\nTipo de evento: ${formData.eventType}`
-    const whatsappUrl = `https://wa.me/5548999557220?text=${encodeURIComponent(message)}`
-    window.open(whatsappUrl, "_blank")
+  function onSubmit(values: ContactFormValues) {
+    const message = `Olá! Gostaria de solicitar um orçamento para o ${siteConfig.name}.\n\nNome: ${values.name}\nTelefone: ${values.phone}\nData do evento: ${values.date}\nTipo de evento: ${values.eventType}`
+
+    // Abre o WhatsApp com a mensagem pronta — sem backend, sem banco de
+    // dados. window.open precisa continuar sendo chamado aqui dentro do
+    // próprio handler de envio para não ser bloqueado como pop-up.
+    window.open(buildWhatsappUrl(message), "_blank")
+    toast.success("Solicitação enviada!", {
+      description: "Continue a conversa que abrimos no WhatsApp para finalizar seu orçamento.",
+    })
+    form.reset()
   }
 
   return (
@@ -42,77 +62,95 @@ export function Contact() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="bg-card rounded-2xl p-8 shadow-2xl">
-            <div className="grid sm:grid-cols-2 gap-6 mb-6">
-              <div className="space-y-2">
-                <label htmlFor="name" className="font-[var(--font-lato)] text-sm font-medium text-foreground">
-                  Nome completo
-                </label>
-                <Input
-                  id="name"
-                  type="text"
-                  placeholder="Seu nome"
-                  required
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="font-[var(--font-lato)]"
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="bg-card rounded-2xl p-8 shadow-2xl">
+              <div className="grid sm:grid-cols-2 gap-6 mb-6">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-[var(--font-lato)] text-sm font-medium text-foreground">
+                        Nome completo
+                      </FormLabel>
+                      <FormControl>
+                        <Input placeholder="Seu nome" className="font-[var(--font-lato)]" {...field} />
+                      </FormControl>
+                      <FormMessage className="font-[var(--font-lato)]" />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="phone" className="font-[var(--font-lato)] text-sm font-medium text-foreground">
-                  Telefone / WhatsApp
-                </label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  placeholder="(00) 00000-0000"
-                  required
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="font-[var(--font-lato)]"
-                />
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="date" className="font-[var(--font-lato)] text-sm font-medium text-foreground">
-                  Data do evento
-                </label>
-                <Input
-                  id="date"
-                  type="date"
-                  required
-                  value={formData.date}
-                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  className="font-[var(--font-lato)]"
-                />
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="eventType" className="font-[var(--font-lato)] text-sm font-medium text-foreground">
-                  Tipo de evento
-                </label>
-                <select
-                  id="eventType"
-                  required
-                  value={formData.eventType}
-                  onChange={(e) => setFormData({ ...formData, eventType: e.target.value })}
-                  className="font-[var(--font-lato)] flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <option value="">Selecione o tipo</option>
-                  <option value="Casamento">Casamento</option>
-                  <option value="Aniversário">Aniversário</option>
-                  <option value="Evento Corporativo">Evento Corporativo</option>
-                  <option value="Confraternização">Confraternização</option>
-                  <option value="Outro">Outro</option>
-                </select>
-              </div>
-            </div>
 
-            <div>
-              <Button type="submit" size="lg" className="w-full font-[var(--font-lato)]">
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-[var(--font-lato)] text-sm font-medium text-foreground">
+                        Telefone / WhatsApp
+                      </FormLabel>
+                      <FormControl>
+                        <Input type="tel" placeholder="(00) 00000-0000" className="font-[var(--font-lato)]" {...field} />
+                      </FormControl>
+                      <FormMessage className="font-[var(--font-lato)]" />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="date"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-[var(--font-lato)] text-sm font-medium text-foreground">
+                        Data do evento
+                      </FormLabel>
+                      <FormControl>
+                        <Input type="date" className="font-[var(--font-lato)]" {...field} />
+                      </FormControl>
+                      <FormMessage className="font-[var(--font-lato)]" />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="eventType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-[var(--font-lato)] text-sm font-medium text-foreground">
+                        Tipo de evento
+                      </FormLabel>
+                      <FormControl>
+                        <select
+                          className="font-[var(--font-lato)] flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive"
+                          {...field}
+                        >
+                          <option value="">Selecione o tipo</option>
+                          {EVENT_TYPES.map((type) => (
+                            <option key={type} value={type}>
+                              {type}
+                            </option>
+                          ))}
+                        </select>
+                      </FormControl>
+                      <FormMessage className="font-[var(--font-lato)]" />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <Button
+                type="submit"
+                size="lg"
+                className="w-full font-[var(--font-lato)]"
+                disabled={form.formState.isSubmitting}
+              >
                 <Send className="w-4 h-4 mr-2" />
                 Enviar Solicitação
               </Button>
-            </div>
-          </form>
+            </form>
+          </Form>
         </div>
       </div>
     </section>
